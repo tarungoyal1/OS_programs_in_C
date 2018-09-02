@@ -88,7 +88,7 @@ int main()
     int n;
     printf("Enter the number of processes:");
     scanf("%d", &n);
-    if (n<=2){
+    if (n<=1){
         printf("Please enter atleast 2 processes!");
         return 0;
     }
