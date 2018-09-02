@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1535905804 source:/home/tarun/Documents/C_Programs_READY/SJF_non_preemptive/main.c
+	<stdio.h>
+	<stdlib.h>
+
