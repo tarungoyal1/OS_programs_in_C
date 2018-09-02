@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1535866279 source:/home/tarun/Documents/c programs/fcfs_no_arrival/main.c
+	<stdio.h>
+	<stdlib.h>
+
