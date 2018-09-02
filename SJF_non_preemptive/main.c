@@ -44,50 +44,63 @@ void executeProcess(Process * pr, int n){
     SortProcessArray(pr, 0, c, 2);
 
     //execute the first process
-    gtc+=pr->bt;
+    gtc=pr->at+pr->bt;
     execute(pr, gtc);
 
-    //now starting from 1 to n, fill all process that are <= gtc and execute the one that has minimum BT
-    //do this for each iteration
+    SortProcessArray(pr, 1, n, 2);
 
+    //now our process array is sorted after the first process means from 2nd element
+    //find minimumAvailable not just minimum in terms of BT but also should be available in terms of AT
     for(int i=1;i<n;i++){
-//        Process **available = (Process * )malloc((n-i)*sizeof(Process));
-        int available[n-1];
-        int avCount = 0;
 
-        //error-prone --->
-        for(int j=0;j<n;j++){
-            if((pr+i+j)->at<=gtc){
-                available[j] = (i+j);
-                avCount++;
-            }
-        }
-        //find shortest of available processes
-        int min = minimum(pr,available, avCount);
-        gtc+= (pr+min)->bt;
-        execute((pr+min), gtc);
-        swap((pr+min), pr+i);
-        //--->
+
+
+       int minIndex = minimumAvailabeIndex(pr, i, n,gtc);
+//       printf("%d:%d-->gtc=\n", i,minIndex,gtc);
+
+       //if arrival time of pr at minIndex>=gtc...means CPU remained idle..handle this here
+       if((pr+minIndex)->at>gtc)gtc = ((pr+minIndex)->at-gtc)+(pr+minIndex)->bt;
+       else gtc+=(pr+minIndex)->bt;
+
+       execute(pr+minIndex, gtc);
+
+       //this is crucial
+       prependExecuted(pr, minIndex,i);
     }
+
 }
+
 void execute(Process *p, int gtc){
     p->ct = gtc;
     p->tat = p->ct - p->at;
     p->wt = p->tat - p->bt;
 }
 
-int minimum(Process * pr,int a[], int n){
-    int min = (pr+a[0])->bt;
-    int j=a[0];
-    for(int i=1;i<n;i++){
-        if(min>(pr+a[i])->bt){
-            min = (pr+a[i])->bt;
-            j=a[i];
-        }
+void prependExecuted(Process * pr, int minIndex, int start){
+    Process temp = *(pr+minIndex);
+    for(int i=minIndex;i>start;i--){
+        swap(pr+i, pr+i-1);
     }
-    return j;
+    *(pr+start) = temp;
 }
 
+int minimumAvailabeIndex(Process * pr, int start, int n, int gtc){
+    //our array is already sorted as per BT
+    for(int i=start;i<n;i++)
+        if((pr+i)->at<=gtc)return i;
+
+    //but what if none of the remaining process came under gtc
+    //then return the process which has least AT in the remaining processes, that is next to come
+    int m = start;
+    int minAT = (pr+m)->at;
+    for(int i=start+1;i<n;i++){
+        if(minAT>(pr+i)->at){
+            minAT = (pr+i)->at;
+            m = i;
+        }
+    }
+    return m;
+}
 
 int countOccurs(Process * pr, int start, int end, int key, int based){
     //count all occurrences in process array from start to end (given) based on 1 for at, 2 for bt
@@ -123,7 +136,7 @@ void SortProcessArray(Process * pr, int start, int end, int based){
             for(int i=start+1;i<end;i++){
                 Process key = *(pr+i);
                 int j=i;
-                for(;j>0&&(pr+j-1)->at>key.at;j--)
+                for(;j>start&&(pr+j-1)->at>key.at;j--)
                     swap((pr+j), (pr+j-1));
                 swap(pr+j, &key);
             }
@@ -132,7 +145,7 @@ void SortProcessArray(Process * pr, int start, int end, int based){
             for(int i=start+1;i<end;i++){
                 Process key = *(pr+i);
                 int j=i;
-                for(;j>0&&(pr+j-1)->bt>key.bt;j--)
+                for(;j>start&&(pr+j-1)->bt>key.bt;j--)
                     swap(pr+j, pr+j-1);
                 swap(pr+j, &key);
             }
@@ -149,6 +162,8 @@ void swap(Process *a, Process *b){
     *a = *b;
     *b = temp;
 }
+
+
 
 int main(){
     int n;
@@ -171,13 +186,13 @@ int main(){
     executeProcess(pr,n);
 
 
-    printf("\nP#\tBT\tAT\tWT\tTAT\n");
+    printf("\nP#\tBT\tAT\tWT\tTAT\tCT\n");
     for(int i=0;i<n;i++)
-        printf(" %d\t%d\t%d\t%d\t%d\n", (pr+i)->pid, (pr+i)->bt, (pr+i)->at, (pr+i)->wt, (pr+i)->tat);
+        printf(" %d\t%d\t%d\t%d\t%d\t%d\n", (pr+i)->pid, (pr+i)->bt, (pr+i)->at, (pr+i)->wt, (pr+i)->tat, (pr+i)->ct);
 
 
-//    printf("\nAverage Wait time = %.2f\n", calcAvgWaitingTime(pr, n));
-//    printf("Average Turn Around time = %.2f\n", calcAvgTurnAroundTime(pr, n));
+    printf("\nAverage Wait time = %.2f\n", calcAvgWaitingTime(pr, n));
+    printf("Average Turn Around time = %.2f\n", calcAvgTurnAroundTime(pr, n));
 
     return 0;
 }
