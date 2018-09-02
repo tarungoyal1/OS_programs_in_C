@@ -163,6 +163,20 @@ void swap(Process *a, Process *b){
     *b = temp;
 }
 
+float calcAvgWaitingTime(Process * pr, int n){
+    int awt = 0;
+    for(int i=0;i<n;i++)
+        awt+=(pr+i)->wt;
+    return (float)awt/n;
+ }
+
+ float calcAvgTurnAroundTime(Process * pr, int n){
+    int atat = 0;
+    for(int i=0;i<n;i++)
+        atat+=(pr+i)->tat;
+    return (float)atat/n;
+ }
+
 
 
 int main(){
