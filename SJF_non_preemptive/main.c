@@ -10,7 +10,7 @@
  at --> arrival time
  wt --> Waiting time
  tat --> Turn around time
-
+ ct ---> Completion time
  */
 
 #include <stdio.h>
@@ -25,111 +25,41 @@ typedef struct P{
     int ct;
 }Process;
 
-void executeProcess(Process * pr, int n){
-    //gtc represent the gantt chart trailing value
-    int gtc=0;
 
-    //first sort the entire array according to arrival time
-    SortProcessArray(pr, 0, n, 1);
-
-    //m contains arrival time of first process which is obviosly minimum
-    int m = pr->at;
-
-    //now count the occurrences of processes that have m .. it's done linear fashion starting from 0
-    int c = countOccurs(pr, 0, n, m, 1);
-
-//    printf("%d,%d", m, c);
-
-    //now sort the process array from 0 to count based on 2 for BT
-    SortProcessArray(pr, 0, c, 2);
-
-    //execute the first process
-    gtc=pr->at+pr->bt;
-    execute(pr, gtc);
-
-    SortProcessArray(pr, 1, n, 2);
-
-    //now our process array is sorted after the first process means from 2nd element
-    //find minimumAvailable not just minimum in terms of BT but also should be available in terms of AT
-    for(int i=1;i<n;i++){
-
-
-
-       int minIndex = minimumAvailabeIndex(pr, i, n,gtc);
-//       printf("%d:%d-->gtc=\n", i,minIndex,gtc);
-
-       //if arrival time of pr at minIndex>=gtc...means CPU remained idle..handle this here
-       if((pr+minIndex)->at>gtc)gtc = ((pr+minIndex)->at-gtc)+(pr+minIndex)->bt;
-       else gtc+=(pr+minIndex)->bt;
-
-       execute(pr+minIndex, gtc);
-
-       //this is crucial
-       prependExecuted(pr, minIndex,i);
-    }
-
+void swap(Process *a, Process *b){
+    Process temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
-void execute(Process *p, int gtc){
+int execute(Process *p, int gtc){
     p->ct = gtc;
-    p->tat = p->ct - p->at;
-    p->wt = p->tat - p->bt;
+    return p->bt-=p->bt;
 }
 
-void prependExecuted(Process * pr, int minIndex, int start){
-    Process temp = *(pr+minIndex);
-    for(int i=minIndex;i>start;i--){
-        swap(pr+i, pr+i-1);
-    }
-    *(pr+start) = temp;
-}
+int minimumAvailabeIndex(Process * pr, int available[], int size){
+    //if available array has only one value just return the index
+    if(size==1)return available[0];
 
-int minimumAvailabeIndex(Process * pr, int start, int n, int gtc){
-    //our array is already sorted as per BT
-    for(int i=start;i<n;i++)
-        if((pr+i)->at<=gtc)return i;
+    //return the process which has least BT
+    int m = available[0];
+    int minBT = (pr+available[0])->bt;
 
-    //but what if none of the remaining process came under gtc
-    //then return the process which has least AT in the remaining processes, that is next to come
-    int m = start;
-    int minAT = (pr+m)->at;
-    for(int i=start+1;i<n;i++){
-        if(minAT>(pr+i)->at){
-            minAT = (pr+i)->at;
-            m = i;
+    for(int i=1;i<size;i++){
+        if(minBT>(pr+available[i])->bt){
+            minBT = (pr+available[i])->bt;
+            m = available[i];
         }
     }
     return m;
 }
 
-int countOccurs(Process * pr, int start, int end, int key, int based){
-    //count all occurrences in process array from start to end (given) based on 1 for at, 2 for bt
-    int c=0;
-    switch(based){
-        case 1:
-            for(int i=start;i<end;i++){
-                    if((pr+i)->at==key)++c;
-            }
-            return c;
-        break;
-        case 2:
-            for(int i=start;i<end;i++){
-                    if((pr+i)->bt==key)++c;
-            }
-            return c;
-        break;
-        default:
-            printf("please tell on which criteria you want to sort the process array (1 or 2)");
-        break;
-    }
-    return c;
-}
 
 void SortProcessArray(Process * pr, int start, int end, int based){
     //Insertion sort
     //start indicates the index where you want to start sorting the array from, considered 0 here
     //end indicates the index where you want to sort the array to
-    //based is flag, if 1 then sort based on AT else if 2 then sort based on BT
+    //based is flag, if 1 then sort based on AT else if 2 then sort based on PID
 
     switch(based){
         case 1:
@@ -145,7 +75,7 @@ void SortProcessArray(Process * pr, int start, int end, int based){
             for(int i=start+1;i<end;i++){
                 Process key = *(pr+i);
                 int j=i;
-                for(;j>start&&(pr+j-1)->bt>key.bt;j--)
+                for(;j>start&&(pr+j-1)->pid>key.pid;j--)
                     swap(pr+j, pr+j-1);
                 swap(pr+j, &key);
             }
@@ -157,11 +87,7 @@ void SortProcessArray(Process * pr, int start, int end, int based){
     }
 }
 
-void swap(Process *a, Process *b){
-    Process temp = *a;
-    *a = *b;
-    *b = temp;
-}
+
 
 float calcAvgWaitingTime(Process * pr, int n){
     int awt = 0;
@@ -176,6 +102,97 @@ float calcAvgWaitingTime(Process * pr, int n){
         atat+=(pr+i)->tat;
     return (float)atat/n;
  }
+
+void executeProcess(Process * pr, int n){
+
+
+    //first declare an temporary array which holds all elements of main pr array
+    //we will perform every operation on this array
+    Process * tempr= (Process *)malloc(n*sizeof(Process));
+
+    for(int i=0;i<n;i++)
+        *(tempr+i) = *(pr+i);
+
+
+    //NOTE: We are sorting the arrays just for the convenience and improve effeciency
+    //we can move further without sorting as well
+
+    //first sort the entire array according to arrival time
+    SortProcessArray(tempr, 0, n, 1);
+
+    //sort main array as well just for printing matching indexes
+    SortProcessArray(pr, 0, n, 1);
+
+
+        //here we use counter to track all processes are fully executed,
+    //counter will increment only when a process fully executes, means till its remaining time becomes 0
+    int counter = 0;
+
+    //gtc is another counter variable which is used similarly as gantt chart final value to track completion time of each process
+    //initially set gtc to arrival time of first process in sorted array (as per arrival time)
+
+    //since we have sorted the array so we assigned the gtc to the AT of first process
+    //if we had not sorted the array then we should've selected the AT of the process having least BT
+
+    int gtc=tempr->at;
+
+    //run a loop till all proccesses gets executed
+    while(counter<n){
+
+        //now check which processes come under the gtc based on their arrival time
+        //if yes then insert that process index only into available array
+
+        int available[n];
+        int availsize=0;
+        int availableIndex=-1;
+        for(int i=0;i<n;i++){
+            //skip the process which is already complete
+            if((tempr+i)->bt==0)
+                continue;
+
+            //insert the available process in availale array
+            if((tempr+i)->at<=gtc){
+                available[++availableIndex]=i;
+                availsize++;
+            }
+        }
+
+
+
+
+
+        if(availsize>0){
+            //now find the process which has minimum BT from available array
+            // m represents the process index for tempr array which has least BT in available array
+            //it is returned with the index value of minimum BT process that were stored in available array
+            int m = minimumAvailabeIndex(tempr, available, availsize);
+
+            //when the function returns 0 means the process BT value (remaining time) has become 0..means completed
+            if(execute(tempr+m,gtc+=(tempr+m)->bt)==0){
+                counter++;
+
+                //also calculate WT and TAT of this completed process at this point:
+                (tempr+m)->tat = (tempr+m)->ct-(tempr+m)->at;
+                (tempr+m)->wt = (tempr+m)->tat-(pr+m)->bt;
+
+            }
+
+        //it is crucial to pre increment the gtc in the else block
+        //because it will cover all process that come after significant gap of completion of the last process available
+        }else ++gtc;
+    }
+
+        printf("\nPID\tBT\tAT\tWT\tTAT\tCT\n");
+        for(int i=0;i<n;i++)
+            printf(" %d\t%d\t%d\t%d\t%d\t%d\n", (tempr+i)->pid, (pr+i)->bt, (tempr+i)->at, (tempr+i)->wt, (tempr+i)->tat, (tempr+i)->ct);
+
+
+        printf("\nAverage Wait time = %.2f\n", calcAvgWaitingTime(tempr, n));
+        printf("Average Turn Around time = %.2f\n", calcAvgTurnAroundTime(tempr, n));
+
+
+
+}
 
 
 
@@ -200,13 +217,6 @@ int main(){
     executeProcess(pr,n);
 
 
-    printf("\nP#\tBT\tAT\tWT\tTAT\tCT\n");
-    for(int i=0;i<n;i++)
-        printf(" %d\t%d\t%d\t%d\t%d\t%d\n", (pr+i)->pid, (pr+i)->bt, (pr+i)->at, (pr+i)->wt, (pr+i)->tat, (pr+i)->ct);
-
-
-    printf("\nAverage Wait time = %.2f\n", calcAvgWaitingTime(pr, n));
-    printf("Average Turn Around time = %.2f\n", calcAvgTurnAroundTime(pr, n));
 
     return 0;
 }
