@@ -4,14 +4,13 @@
    find me on github at https://github.com/tarungoyal1
  */
 
- /* This is Non-Preemptive SJF and in this program, any process may contain same bt or at
- prId --> ProceesId
+ /* This is Preemptive SJF or also known as SRTF and in this program, any process may contain same bt or at
+ pid--> ProceesId
  bt --> Burst time
  at --> arrival time
  wt --> Waiting time
  tat --> Turn around time
  ct --> Completion time
- rt --> Remaining Time
  */
 
 #include <stdio.h>
