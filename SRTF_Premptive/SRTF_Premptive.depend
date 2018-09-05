@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1536161965 source:/home/tarun/Documents/DAA programs in C_github/SRTF_Premptive/main.c
+	<stdio.h>
+	<stdlib.h>
+
