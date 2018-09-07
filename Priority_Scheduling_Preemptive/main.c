@@ -1,7 +1,23 @@
+/* Priority Scheduling Algorithm -Preemptive program in C
+   Made by Tarun Goyal,
+   find me on github at https://github.com/tarungoyal1
+ */
+
+ /* This is Preemptive version of Priority Scheduling Algorithm and in this program, any process may contain same bt or at
+ You will have to decide which process has to executed which has highest priority and also available in system as per their arrival time
+
+ prId --> ProceesId
+ bt --> Burst time
+ at --> arrival time
+ wt --> Waiting time
+ tat --> Turn around time
+ ct ---> Completion time
+ remt --> Remaining time
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
-
-
 
 typedef struct P{
     int pid;

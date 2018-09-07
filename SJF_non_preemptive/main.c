@@ -11,6 +11,7 @@
  wt --> Waiting time
  tat --> Turn around time
  ct ---> Completion time
+ remt --> Remaining time
  */
 
 #include <stdio.h>
@@ -23,6 +24,7 @@ typedef struct P{
     int wt;
     int tat;
     int ct;
+    int remt;
 }Process;
 
 
@@ -34,20 +36,20 @@ void swap(Process *a, Process *b){
 
 int execute(Process *p, int gtc){
     p->ct = gtc;
-    return p->bt-=p->bt;
+    return p->remt-=p->remt;
 }
 
 int minimumAvailabeIndex(Process * pr, int available[], int size){
     //if available array has only one value just return the index
     if(size==1)return available[0];
 
-    //return the process which has least BT
+    //return the process which has least BT as remt
     int m = available[0];
-    int minBT = (pr+available[0])->bt;
+    int minBT = (pr+available[0])->remt;
 
     for(int i=1;i<size;i++){
-        if(minBT>(pr+available[i])->bt){
-            minBT = (pr+available[i])->bt;
+        if(minBT>(pr+available[i])->remt){
+            minBT = (pr+available[i])->remt;
             m = available[i];
         }
     }
@@ -120,9 +122,6 @@ void executeProcess(Process * pr, int n){
     //first sort the entire array according to arrival time
     SortProcessArray(tempr, 0, n, 1);
 
-    //sort main array as well just for printing matching indexes
-    SortProcessArray(pr, 0, n, 1);
-
 
         //here we use counter to track all processes are fully executed,
     //counter will increment only when a process fully executes, means till its remaining time becomes 0
@@ -147,7 +146,7 @@ void executeProcess(Process * pr, int n){
         int availableIndex=-1;
         for(int i=0;i<n;i++){
             //skip the process which is already complete
-            if((tempr+i)->bt==0)
+            if((tempr+i)->remt==0)
                 continue;
 
             //insert the available process in availale array
@@ -168,12 +167,12 @@ void executeProcess(Process * pr, int n){
             int m = minimumAvailabeIndex(tempr, available, availsize);
 
             //when the function returns 0 means the process BT value (remaining time) has become 0..means completed
-            if(execute(tempr+m,gtc+=(tempr+m)->bt)==0){
+            if(execute(tempr+m,gtc+=(tempr+m)->remt)==0){
                 counter++;
 
                 //also calculate WT and TAT of this completed process at this point:
                 (tempr+m)->tat = (tempr+m)->ct-(tempr+m)->at;
-                (tempr+m)->wt = (tempr+m)->tat-(pr+m)->bt;
+                (tempr+m)->wt = (tempr+m)->tat-(tempr+m)->bt;
 
             }
 
@@ -184,7 +183,7 @@ void executeProcess(Process * pr, int n){
 
         printf("\nPID\tBT\tAT\tWT\tTAT\tCT\n");
         for(int i=0;i<n;i++)
-            printf(" %d\t%d\t%d\t%d\t%d\t%d\n", (tempr+i)->pid, (pr+i)->bt, (tempr+i)->at, (tempr+i)->wt, (tempr+i)->tat, (tempr+i)->ct);
+            printf(" %d\t%d\t%d\t%d\t%d\t%d\n", (tempr+i)->pid, (tempr+i)->bt, (tempr+i)->at, (tempr+i)->wt, (tempr+i)->tat, (tempr+i)->ct);
 
 
         printf("\nAverage Wait time = %.2f\n", calcAvgWaitingTime(tempr, n));
@@ -211,8 +210,10 @@ int main(){
     //Enter process id, burst time and then arrival time for each process separated by space, line by line
 
     printf("Enter PID, BT, AT for each process separated by space, line by line:\n");
-    for(int i=0;i<n;i++)
+    for(int i=0;i<n;i++){
      scanf("%d%d%d", &(pr+i)->pid, &(pr+i)->bt, &(pr+i)->at);
+     (pr+i)->remt = (pr+i)->bt;
+    }
 
     executeProcess(pr,n);
 
