@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1536315871 source:/home/tarun/Documents/DAA programs in C_github/Priority_Non_preemptive/main.c
+	<stdio.h>
+	<stdlib.h>
+
