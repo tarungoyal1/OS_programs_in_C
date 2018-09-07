@@ -57,35 +57,15 @@ int minimumAvailabeIndex(Process * pr, int available[], int size){
 }
 
 
-void SortProcessArray(Process * pr, int start, int end, int based){
-    //Insertion sort
-    //start indicates the index where you want to start sorting the array from, considered 0 here
-    //end indicates the index where you want to sort the array to
-    //based is flag, if 1 then sort based on AT else if 2 then sort based on PID
+void SortProcessArray(Process * pr, int n){
+    //Insertion sort based on arrival time
 
-    switch(based){
-        case 1:
-            for(int i=start+1;i<end;i++){
-                Process key = *(pr+i);
-                int j=i;
-                for(;j>start&&(pr+j-1)->at>key.at;j--)
-                    swap((pr+j), (pr+j-1));
-                swap(pr+j, &key);
-            }
-        break;
-        case 2:
-            for(int i=start+1;i<end;i++){
-                Process key = *(pr+i);
-                int j=i;
-                for(;j>start&&(pr+j-1)->pid>key.pid;j--)
-                    swap(pr+j, pr+j-1);
-                swap(pr+j, &key);
-            }
-        break;
-        default:
-            printf("please tell on which criteria you want to sort the process array (1 or 2)");
-            return;
-        break;
+   for(int i=start+1;i<end;i++){
+            Process key = *(pr+i);
+            int j=i;
+            for(;j>start&&(pr+j-1)->at>key.at;j--)
+                swap((pr+j), (pr+j-1));
+            swap(pr+j, &key);
     }
 }
 
@@ -117,10 +97,10 @@ void executeProcess(Process * pr, int n){
 
 
     //NOTE: We are sorting the arrays just for the convenience and improve effeciency
-    //we can move further without sorting as well
+    //we can move further without sorting as well with an alternative logic to find process of minimum arrival time
 
     //first sort the entire array according to arrival time
-    SortProcessArray(tempr, 0, n, 1);
+    SortProcessArray(tempr, n);
 
 
         //here we use counter to track all processes are fully executed,

@@ -3,7 +3,7 @@
    find me on github at https://github.com/tarungoyal1
  */
 
- /* This is Non-Preemptive FCFS and in this program, each process is more likey have different arrival time
+ /* This is Non-Preemptive FCFS and in this program, each process is likey have different arrival time
  i.e., one process comes after the other.
 
  prId --> ProcessId
@@ -29,7 +29,7 @@ void executeProcesses(Process * pr, int n){
     /*
     Although this is Non pre-emptive FCFS and we don't require sorting based on arrival time as per original
     scheduling logic but we've sorted the process array bcoz user may enter arrival time in unsorted order which will break
-    the logic we are using to achive the result.
+    the logic we are using to achieve the result.
     */
 
     SortArrivalTime(pr, n);
