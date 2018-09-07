@@ -6,7 +6,7 @@
  /* This is Non-Preemptive FCFS and in this program, each process is more likey have different arrival time
  i.e., one process comes after the other.
 
- prId --> ProceesId
+ prId --> ProcessId
  bt --> Burst time
  at --> arrival time
  wt --> Waiting time

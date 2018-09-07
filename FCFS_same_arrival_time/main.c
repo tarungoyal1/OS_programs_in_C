@@ -6,7 +6,7 @@
  /* In this program, I have assumed the arrival time of all processes is same i.e. 0
  means all processes are available to CPU.
 
- prId --> ProceesId
+ prId --> ProcessId
  bt --> Burst time
  at --> arrival time
  wt --> Waiting time

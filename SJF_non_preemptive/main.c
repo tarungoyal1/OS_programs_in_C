@@ -5,7 +5,7 @@
 
  /* This is Non-Preemptive SJF and in this program, any process may contain same bt or at
 
- prId --> ProceesId
+ pid --> ProcessId
  bt --> Burst time
  at --> arrival time
  wt --> Waiting time

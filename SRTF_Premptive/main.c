@@ -5,7 +5,7 @@
  */
 
  /* This is Preemptive SJF or also known as SRTF and in this program, any process may contain same bt or at
- pid--> ProceesId
+ pid--> ProcessId
  bt --> Burst time
  at --> arrival time
  wt --> Waiting time
