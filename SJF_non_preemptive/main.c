@@ -60,10 +60,10 @@ int minimumAvailabeIndex(Process * pr, int available[], int size){
 void SortProcessArray(Process * pr, int n){
     //Insertion sort based on arrival time
 
-   for(int i=start+1;i<end;i++){
+   for(int i=1;i<end;i++){
             Process key = *(pr+i);
             int j=i;
-            for(;j>start&&(pr+j-1)->at>key.at;j--)
+            for(;j>0&&(pr+j-1)->at>key.at;j--)
                 swap((pr+j), (pr+j-1));
             swap(pr+j, &key);
     }
