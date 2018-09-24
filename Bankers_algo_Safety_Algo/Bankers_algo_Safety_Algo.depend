@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1537809937 source:/home/tarun/Documents/C_Programs_READY/Bankers_algo_Safety_Algo/main.c
+	<stdio.h>
+	<stdlib.h>
+
