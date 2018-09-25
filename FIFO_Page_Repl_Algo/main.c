@@ -11,12 +11,12 @@ int main()
 
     int * frame = (int *)malloc(framesize*sizeof(int));
 
-    *(frame+0) = -1;
-    *(frame+1) = -1;
-    *(frame+2) = -1;
+    for(int i=0;i<framesize;i++)
+        *(frame+i) = -1;
 
     // -1 means no page is inserted initially
 
+    //this is the index/counter which will be used to track where the next page will be inserted as per FIFO rule
     int frameindex = 0;
 
     printf("!--Enter page=-1 to exit the loop--!\n");
