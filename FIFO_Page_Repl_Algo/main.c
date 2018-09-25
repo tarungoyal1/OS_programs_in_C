@@ -1,3 +1,12 @@
+/*
+	Page replacement algo - FIFO mode
+	Implementation in C by Tarun Goyal (15scse104026) 2017
+	find me at github: https://github.com/tarungoyal1
+
+*/
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
