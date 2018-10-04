@@ -22,13 +22,15 @@ typedef struct P{
     int pid;
     int bt;
     int at;
-    int prity;
     int wt;
     int tat;
     int ct;
     int remt;
 }Process;
 
+//this is very simple flag that tells what number user has entered the first process id with.
+//p0, p1, p2...... or p1, p2, p3...
+int reqflag=0;
 
 void swap(Process *A, Process *B){
     Process temp = *A;
@@ -110,6 +112,7 @@ void executeProcess(Process * pr, int n, int quantum){
 
     //  this will contain the index of the process which is last executed
     int last =-1;
+     printf("\nRequest queue:");
 
     while(counter<n){
 
@@ -147,7 +150,7 @@ void executeProcess(Process * pr, int n, int quantum){
             int c =  request[requestCounter];
             int tq = quantum;
 
-            printf("%d\n", c+1);
+            printf("P%d,", c+reqflag);
 
             if((tempr+c)->remt<quantum){
                 gtc+=(tempr+c)->remt;
@@ -181,7 +184,7 @@ void executeProcess(Process * pr, int n, int quantum){
         }else ++gtc;
     }
 
-    printf("PID\tBT\tAT\tWT\tTAT\tCT\n");
+    printf("\nPID\tBT\tAT\tWT\tTAT\tCT\n");
     for(int i=0;i<n;i++)
         printf("%d\t%d\t%d\t%d\t%d\t%d\n", (tempr+i)->pid, (tempr+i)->bt, (tempr+i)->at, (tempr+i)->wt, (tempr+i)->tat, (tempr+i)->ct);
 
@@ -206,6 +209,11 @@ int main()
          scanf("%d%d%d", &(pr+i)->pid, &(pr+i)->bt, &(pr+i)->at);
          (pr+i)->remt = (pr+i)->bt;
     }
+
+    //this sets reqflag as the process id of first process
+    //this has nothing to do with execution logic but it is helpful in printing request queue
+
+    reqflag = pr->pid;
 
     printf("Please enter the time quantum:");
     scanf("%d", &quantum);
